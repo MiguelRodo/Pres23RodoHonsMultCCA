@@ -22,7 +22,7 @@ We have two random vectors $\symbf{X}^{(1)}:2\times 1$ and $\symbf{X}^{(2)}:2\ti
 \begin{bmatrix}
   \mathrm{Corr}[\symbf{X}^{(1)}] &
     \mathrm{Corr}[\symbf{X}^{(1)}, \symbf{X}^{(2)}] \\
-  \mathrm{Corr}[\symbf{X}^{(1)}, \symbf{X}^{(2)}] &
+  \mathrm{Corr}[\symbf{X}^{(2)}, \symbf{X}^{(1)}] &
     \mathrm{Corr}[\symbf{X}^{(2)}] \\
 \end{bmatrix} \\
   &=
