@@ -1,7 +1,7 @@
 Package: Pres23RodoHonsMultCCA
 Title: Slides for 2023 honours multivariate canonical correlation analysis
         lecture
-Version: 0.0.0-1
+Version: 1.0.0
 Authors@R: person("Miguel", "Rodo", , "miguel.rodo@uct.ac.za", role =
         c("aut", "cre"))
 Maintainer: Miguel Rodo <miguel.rodo@uct.ac.za>
