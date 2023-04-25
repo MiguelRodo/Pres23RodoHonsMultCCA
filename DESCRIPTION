@@ -1,12 +1,9 @@
 Package: Pres23RodoHonsMultCCA
-Title: Slides for 2023 honours multivariate canonical correlation analysis
-        lecture
-Version: 1.0.0
-Authors@R: person("Miguel", "Rodo", , "miguel.rodo@uct.ac.za", role =
-        c("aut", "cre"))
+Title: Slides for 2023 honours multivariate canonical correlation analysis lecture
+Version: 1.0.1
+Authors@R: person("Miguel", "Rodo", , "miguel.rodo@uct.ac.za", role = c("aut", "cre"))
 Maintainer: Miguel Rodo <miguel.rodo@uct.ac.za>
-Description: Slides for 2023 honours multivariate canonical correlation
-        analysis lecture
+Description: Slides for 2023 honours multivariate canonical correlation analysis lecture
 License: CC BY 4.0
 URL: https://github.com/MiguelRodo/Pres23RodoHonsMultCCA/#readme
 BugReports: https://github.com/MiguelRodo/Pres23RodoHonsMultCCA/issues
