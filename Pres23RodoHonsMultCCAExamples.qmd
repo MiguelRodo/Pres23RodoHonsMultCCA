@@ -1,0 +1,243 @@
+---
+title: Examples
+format:
+  html: 
+    self-contained: true
+---
+
+## Example one
+
+We have two random vectors $\symbf{X}^{(1)}:2\times 1$ and $\symbf{X}^{(2)}:2\times 1$ whose correlations are given by
+
+\begin{align*}
+\mathrm{\rho} &= \mathrm{Corr}[\symbf{X}] \\
+&= 
+\mathrm{Corr} \begin{bmatrix}
+  \begin{pmatrix}
+    \symbf{X}^{(1)} \\
+    \symbf{X}^{(2)}
+  \end{pmatrix}
+\end{bmatrix} \\
+&=
+\begin{bmatrix}
+  \mathrm{Corr}[\symbf{X}^{(1)}] &
+    \mathrm{Corr}[\symbf{X}^{(1)}, \symbf{X}^{(2)}] \\
+  \mathrm{Corr}[\symbf{X}^{(1)}, \symbf{X}^{(2)}] &
+    \mathrm{Corr}[\symbf{X}^{(2)}] \\
+\end{bmatrix} \\
+  &=
+  \begin{bmatrix}
+     \symbf{\rho}_{11} & \symbf{\rho}_{21} \\
+     \symbf{\rho}_{21} & \symbf{\rho}_{22} \\
+  \end{bmatrix} \\
+  &=
+  \begin{bmatrix}
+     1 & 0.4 &  0.5 & 0.6 \\
+      0.4 & 1 & 0.3 & 0.4 \\
+      0.5 & 0.3 & 1 & 0.2 \\
+      0.6 & 0.4 & 0.2 & 1 \\
+  \end{bmatrix},
+\end{align*}
+
+which means that 
+
+\begin{align*}
+  \symbf{\rho}_{11} &= 
+  \begin{bmatrix}
+     1 & 0.4 \\
+      0.4 & 1 \\
+  \end{bmatrix}, \\
+  \symbf{\rho}_{12} &=
+  \begin{bmatrix}
+     0.5 & 0.6 \\
+      0.3 & 0.4 \\
+  \end{bmatrix}, \\
+  \symbf{\rho}_{21} &=
+  \begin{bmatrix}
+     0.5 & 0.3 \\
+      0.6 & 0.4 \\
+  \end{bmatrix}, \; \mathrm{and} \\
+  \symbf{\rho}_{22} &=
+  \begin{bmatrix}
+     1 & 0.2 \\
+      0.2 & 1 \\
+  \end{bmatrix}.
+\end{align*}
+
+### Canonical correlation vectors and correlations
+
+Now, we wish to perform canonical correlation analysis, which means finding the coefficient vectors of the canonical correlation pairs ($U_k$ and $V_k$) and their correlations $\rho^{\ast}_k$.
+
+The matrix $\symbf{\rho}$ can be read into `R` using the following code:
+
+```{r}
+#| echo: true
+rho_mat <- structure(
+  c(
+    1, 0.4, 0.5, 0.6,
+    0.4, 1, 0.3, 0.4,
+    0.5, 0.3, 1, 0.2,
+    0.6, 0.4, 0.2, 1
+  ),
+  dim = c(4L, 4L)
+  )
+```
+
+Since
+
+\begin{align*}
+U_k &= \mathbf{e}_k'\Sigma_{11}^{-\frac{1}{2}} \mathbf{X}^{(1)}
+\end{align*}
+
+where $\mathbf{e}_k$ is the $k$-th eigenvector and $\rho_k^{\ast^2}$ the corresponding ($k$-th largest) eigenvalue of 
+$\symbf{R}_1 = \symbf{\rho}_{11}^{-\frac{1}{2}} \symbf{\rho}_{12} \symbf{\rho}_{22}^{-1} \symbf{\rho}_{21} \symbf{\rho}_{11}^{-\frac{1}{2}},$ the CCA is almost done once we get the eigenvectors and eigenvalues of $\symbf{R}_1$.
+
+To get $\symbf{R}_1$, we extract the following block matrices from $\symbf{\rho}$:
+```{r}
+rho_mat_11 <- rho_mat[1:2, 1:2]
+rho_mat_12 <- rho_mat[1:2, 3:4]
+rho_mat_21 <- rho_mat[3:4, 1:2]
+rho_mat_22 <- rho_mat[3:4, 3:4]
+```
+
+Then, we compute $\symbf{R}_1$. 
+
+The one mathematical point worth noting when calculating $\symbf{R}_1$ is that for a given matrix with SVD $\symbf{U}\symbf{D}\symbf{V}'$ the square root matrix is given by $\symbf{U}\symbf{D}^{\frac{1}{2}}\symbf{V}'$.
+
+We calculate the square root matrices for $\symbf{\rho}_{11}$ and $\symbf{\rho}_{22}$:
+
+```{r}
+svd_11 <- svd(rho_mat_11)
+rho_mat_11_sqrt <- svd_11$u %*% diag(sqrt(svd_11$d)) %*% t(svd_11$v)
+svd_22 <- svd(rho_mat_22)
+rho_mat_22_sqrt <- svd_22$u %*% diag(sqrt(svd_22$d)) %*% t(svd_22$v)
+```
+
+Rounding for display purposes (which we do throughout) we have that $\symbf{R}_1$ is
+
+```{r}
+R_1 <-
+  solve(rho_mat_11_sqrt) %*% rho_mat_12 %*%
+  solve(rho_mat_22) %*% rho_mat_21 %*%
+  solve(rho_mat_11_sqrt)
+R_1 |> round(2)
+```
+
+and its eigen-values and -vectors:
+
+```{r}
+eig_obj_1 <- eigen(R_1)
+eig_vec_mat <- eig_obj_1$vectors
+eig_val_vec <- eig_obj_1$values
+```
+
+The CCA coefficient vectors are are along the rows of the following matrix 
+
+```{r}
+coef_mat_u <- t(eig_vec_mat) %*% solve(rho_mat_11_sqrt)
+coef_mat_u |> round(2)
+```
+
+The corresponding canonical correlations are given by
+
+```{r}
+t(eig_val_vec) |> sqrt() |> round(3)
+```
+
+We could perform the analogous procedure to get the canonical coefficient vectors for $V_k$ (swopping a $1$ for a $2$ and vice versa in all the subscripts), but this involves more tedious work and, more importantly, involves the (possibly computationally expensive) calculation of eigenvectors and eigenvalues.
+Therefore we use the fact that 
+
+$$
+\symbf{f}_k = c_k \symbf{\rho}_{22}^{-\frac{1}{2}} \symbf{\rho}_{21} \symbf{\rho}_{11}^{-\frac{1}{2}} \mathbf{e}_k
+$$
+
+for $c_k \in \mathcal{R}$ such that
+
+$$
+\mathrm{Var}[V_k]=
+\sum_{i=1}^2c_k^2f_{k_i}^2\mathrm{Var}[X^{(2)}_i] =
+1.
+$$
+
+In other words, $c_k$ is a scaling constant.
+It's needed because we restrict $\mathrm{Var}[V_k]=1$
+(as otherwise any solution would be a multiple of any other solution).
+
+The unscaled coefficient vectors are along the rows of $\symbf{F}^{\ast}$ below:
+
+```{r}
+F_star <- t(solve(rho_mat_22) %*% rho_mat_21 %*% eig_vec_mat)
+F_star |> round(2)
+```
+
+We then calculate the implied variance of each row by the formula
+$\mathrm{Var}[\symbf{a}'\symbf{X}]=\symbf{a}'\symbf{\Sigma}\symbf{a}$,
+where the variances are elements in the following vector:
+
+```{r}
+var_vec <- F_star %*% rho_mat_22 %*% t(F_star) |> diag()
+```
+
+We then divide each row of $\symbf{F}^{\ast}$ by the square root of the corresponding element of $\mathrm{Var}[\symbf{a}'\symbf{X}]$ to get the coefficient vectors for $V_k$ (along the rows of the matrix below):
+
+```{r}
+coef_mat_v <- solve(sqrt(diag(var_vec))) %*% F_star
+coef_mat_v |> round(2)
+```
+
+### Correlations with original variables
+
+Let $\symbf{A}=\begin{bmatrix} \symbf{a}_1 \symbf{a}_2 \end{bmatrix}'$ be the matrix with the canonical coefficient vectors for $U_k$ (`coef_mat_u` above) along the rows, and $\symbf{B}$ be the corresponding matrix for $V_k$ (`coef_mat_v` above).
+
+Then we have that $\symbf{U} = \begin{bmatrix} U_1 & U_2 \end{bmatrix}' = \symbf{A}'\symbf{X}^{(1)}$ and $\symbf{V} = \begin{bmatrix} V_1 & V_2 \end{bmatrix}' = \symbf{B}'\symbf{X}^{(2)}$.
+
+Then we can can calculate the correlations between the canonical variables and the original variables as follows: 
+
+$$
+\symbf{\rho}_{\symbf{U},\symbf{X}^{(1)}} = \symbf{A}\symbf{\rho}_{11}, \; \mathrm{and}
+\symbf{\rho}_{\symbf{V},\symbf{X}^{(2)}} = \symbf{B}\symbf{\rho}_{22}.
+$$
+
+Using the matrices already calculated, we have that $\symbf{\rho}_{\symbf{U},\symbf{X}^{(1)}}$ is given by
+
+```{r}
+coef_mat_u %*% rho_mat_11 |> round(2)
+```
+
+and $\symbf{\rho}_{\symbf{V},\symbf{X}^{(2)}}$ is given by
+
+```{r}
+coef_mat_v %*% rho_mat_22 |> round(2)
+```
+
+### Proportion of variation explained
+
+*Note: this won't be tested as we didn't get into this much in the lecture and it's only one line in the examples. I'm including this as it's included in the example code.*
+
+The proportion of variation in $U_k$ explained by $\symbf{X}^{(2)}$
+is given by the squared $k$-th canonical correlation coefficient, i.e. $\rho^{\ast 2}_k$.
+The motivation for this is that we can see $V_k=\symbf{b}_k'\symbf{X}^{(2)}$
+as the best linear predictor in $\symbf{X}^{(2)}$ of $U_k$.
+The squared correlation between an outcome variable and its
+best linear predictor is the proportion of the variance in
+the outcome variable that is explained by the predictor.
+
+Analogously, $\rho^{\ast 2}_k$ is also the proportion
+of variation explained in $V_k$ by $\symbf{X}^{(1)}$.
+
+Therefore, the proportion of variation explained in
+$U_k$ by $\symbf{X}^{(2)}$ (and in $V_k$ by $\symbf{X}^{(1)}$)
+is given by the $k$-th element of 
+
+
+```{r}
+t(eig_val_vec) |> round(3)
+```
+
+as we want $\rho^{\ast 2}_k$ and $\rho^{\ast}_k$ is the square root of the $k$-th
+eigenvalue of $\symbf{R}_1,\symbf{R}_2$.
+
+
+
+
+
