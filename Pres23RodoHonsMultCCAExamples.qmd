@@ -86,7 +86,7 @@ rho_mat <- structure(
 Since
 
 \begin{align*}
-U_k &= \mathbf{e}_k'\Sigma_{11}^{-\frac{1}{2}} \mathbf{X}^{(1)}
+U_k &= \mathbf{e}_k'\symbf{\Sigma}_{11}^{-\frac{1}{2}} \mathbf{X}^{(1)}
 \end{align*}
 
 where $\mathbf{e}_k$ is the $k$-th eigenvector and $\rho_k^{\ast^2}$ the corresponding ($k$-th largest) eigenvalue of 
