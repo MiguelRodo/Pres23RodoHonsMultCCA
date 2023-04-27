@@ -1,0 +1,19 @@
+{
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "features": {
+    "ghcr.io/rocker-org/devcontainer-features/r-rig:1": {
+		"installRMarkdown": true,
+		"installRadian": true,
+		"version": "release",
+		"pakVersion": "auto",
+		"vscodeRSupport": "full",
+		"pandocVersion": "latest"
+	},
+    "ghcr.io/rocker-org/devcontainer-features/quarto-cli:1": {
+		"installTinyTex": true,
+		"installChromium": true,
+		"version": "latest"
+	}
+  },
+  "postCreateCommand": "sh scripts/shell/setup-r-minimal.sh"
+}
